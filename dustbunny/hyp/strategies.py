@@ -21,10 +21,10 @@ WORDCHARS=ALPHANUM+'-_'
 
 __all__ = (
     'words',
-#     'gfywords',
-#    'gfycodes',
-#    'first_names',
-#    'last_names',
+    'gfywords',
+    'gfycodes',
+    'first_names',
+    'last_names',
     'alphanumeric',
     'datetimes_in_range',
 )
