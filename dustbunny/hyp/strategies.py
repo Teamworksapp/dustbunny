@@ -4,8 +4,8 @@ Define a bounded date strategy for Hypothesis.
 
 from hypothesis.errors import InvalidArgument
 from hypothesis.searchstrategy import SearchStrategy
-from hypothesis.strategies import defines_strategy
-from hypothesis import strategies as st
+from hypothesis.strategies import defines_strategy, composite
+from hypothesis import assume, strategies as st
 import hypothesis.internal.conjecture.utils as cu
 
 import pytz
@@ -14,7 +14,6 @@ import random
 import time
 from functools import partial
 import os
-from random import randint
 
 
 ALPHANUM='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz9123456789'
@@ -33,21 +32,34 @@ __all__ = (
 words = partial(st.text, alphabet=WORDCHARS)
 alphanumeric = partial(st.text, alphabet=ALPHANUM)
 
-# with open(os.path.join(os.path.dirname(__file__), 'assets', 'first_names.txt')) as names:
-#     first_names = partial(st.choice, [x.strip().title() for x in names.readlines()])
-# 
-# with open(os.path.join(os.path.dirname(__file__), 'assets', 'last_names.txt')) as names:
-#     last_names = partial(st.choice, [x.strip().title() for x in names.readlines()])
-# 
-# with open(os.path.join(os.path.dirname(__file__), 'assets', 'adjectives.txt')) as names:
-#     adjectives = [x.strip().title().replace(' ', '') for x in names.readlines()]
-# 
-# with open(os.path.join(os.path.dirname(__file__), 'assets', 'animals.txt')) as names:
-#     animals = [x.strip().title().replace(' ', '') for x in names.readlines()]
-#     
-# randsel = lambda x: x[randint(0, len(x))]    
-# gfyword = lambda: ' '.join([randsel(adjectives), randsel(adjectives), randsel(animals)])
-# gfycode = lambda: ''.join([randsel(adjectives), randsel(adjectives), randsel(animals)])
+with open(os.path.join(os.path.dirname(__file__), 'assets', 'first_names.txt')) as names:
+    first_names = partial(st.sampled_from, [x.strip().title() for x in names.readlines()])
+
+with open(os.path.join(os.path.dirname(__file__), 'assets', 'last_names.txt')) as names:
+    last_names = partial(st.sampled_from, [x.strip().title() for x in names.readlines()])
+
+with open(os.path.join(os.path.dirname(__file__), 'assets', 'adjectives.txt')) as names:
+    adjectives = [x.strip().title().replace(' ', '') for x in names.readlines()]
+
+with open(os.path.join(os.path.dirname(__file__), 'assets', 'animals.txt')) as names:
+    animals = [x.strip().title().replace(' ', '') for x in names.readlines()]
+    
+@composite
+def gfywords(draw):
+    x = adjectives[draw(st.integers(min_value=0, max_value=len(adjectives)))]
+    y = adjectives[draw(st.integers(min_value=0, max_value=len(adjectives)))]
+    z = animals[draw(st.integers(min_value=0, max_value=len(animals)))]
+    assume(x != y)
+    return ' '.join((x, y, z))    
+    
+@composite
+def gfycodes(draw):
+    x = adjectives[draw(st.integers(min_value=0, max_value=len(adjectives)))]
+    y = adjectives[draw(st.integers(min_value=0, max_value=len(adjectives)))]
+    z = animals[draw(st.integers(min_value=0, max_value=len(animals)))]
+    assume(x != y)
+    return ''.join((x, y, z))
+    
 
 
 

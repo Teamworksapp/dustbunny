@@ -19,7 +19,7 @@ short
 small 
 tall 
 tiny 
- boiling 
+boiling 
 breezy 
 broken 
 bumpy 
@@ -1044,7 +1044,6 @@ reduced
 cruel
 coastal
 peculiar
-racial
 ugly
 swiss
 crude
