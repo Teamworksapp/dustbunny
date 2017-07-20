@@ -14,6 +14,7 @@ import random
 import time
 from functools import partial
 import os
+from random import randint
 
 
 ALPHANUM='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz9123456789'
@@ -21,9 +22,10 @@ WORDCHARS=ALPHANUM+'-_'
 
 __all__ = (
     'words',
-    'gfywords',
-    'first_names',
-    'last_names',
+#     'gfywords',
+#    'gfycodes',
+#    'first_names',
+#    'last_names',
     'alphanumeric',
     'datetimes_in_range',
 )
@@ -31,14 +33,25 @@ __all__ = (
 words = partial(st.text, alphabet=WORDCHARS)
 alphanumeric = partial(st.text, alphabet=ALPHANUM)
 
-with open(os.path.join(os.path.dirname(__file__), 'assets', 'first_names.txt')) as names:
-    first_names = partial(st.choice, [x.strip().title() for x in names.readlines()])
+# with open(os.path.join(os.path.dirname(__file__), 'assets', 'first_names.txt')) as names:
+#     first_names = partial(st.choice, [x.strip().title() for x in names.readlines()])
+# 
+# with open(os.path.join(os.path.dirname(__file__), 'assets', 'last_names.txt')) as names:
+#     last_names = partial(st.choice, [x.strip().title() for x in names.readlines()])
+# 
+# with open(os.path.join(os.path.dirname(__file__), 'assets', 'adjectives.txt')) as names:
+#     adjectives = [x.strip().title().replace(' ', '') for x in names.readlines()]
+# 
+# with open(os.path.join(os.path.dirname(__file__), 'assets', 'animals.txt')) as names:
+#     animals = [x.strip().title().replace(' ', '') for x in names.readlines()]
+#     
+# randsel = lambda x: x[randint(0, len(x))]    
+# gfyword = lambda: ' '.join([randsel(adjectives), randsel(adjectives), randsel(animals)])
+# gfycode = lambda: ''.join([randsel(adjectives), randsel(adjectives), randsel(animals)])
 
-with open(os.path.join(os.path.dirname(__file__), 'assets', 'last_names.txt')) as names:
-    last_names = partial(st.choice, [x.strip().title() for x in names.readlines()])
+
 
 class DatetimeStrategy(SearchStrategy):
-
     def __init__(self, allow_naive, timezones, start_date=None, end_date=None, start_inclusive=True, end_inclusive=True):
         self.allow_naive = allow_naive
         self.timezones = timezones
