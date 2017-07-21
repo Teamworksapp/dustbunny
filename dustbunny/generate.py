@@ -19,6 +19,12 @@ class Generate(object):
         self.strategy = {}
         self.fixtures = {}
         self.relative_values = []
+        self.extras = {}
+        
+    def with_extras(self, **kwargs):
+        ret = copy.copy(self)
+        ret.extras = kwargs
+        return ret
         
     def by_method(self, create_func):
         ret = copy.copy(self)
@@ -33,7 +39,9 @@ class Generate(object):
                 
     def _do(self, **parents):
         if self.dist is not None:
-            k = self.dist
+            k = self.dist(1)[0]
+            if k == 0:
+                k = 1
         else:
             k = self.n
             
@@ -43,7 +51,7 @@ class Generate(object):
         def gen(**kwargs):
             rels = {}
             for rv in self.relative_values:
-                rels.update({name: xform(**kwargs, **parents, **self.fixtures, **rels) for name, xform in rv.items()})
+                rels.update({name: xform(**kwargs, **parents, **self.fixtures, **rels, **self.extras) for name, xform in rv.items()})
             recs.append(self.create(self.model, **kwargs, **parents, **self.fixtures, **rels))
         
         if self.strategy:    

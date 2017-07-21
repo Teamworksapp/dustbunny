@@ -46,9 +46,9 @@ with open(os.path.join(os.path.dirname(__file__), 'assets', 'animals.txt')) as n
     
 @composite
 def gfywords(draw):
-    x = adjectives[draw(st.integers(min_value=0, max_value=len(adjectives)))]
-    y = adjectives[draw(st.integers(min_value=0, max_value=len(adjectives)))]
-    z = animals[draw(st.integers(min_value=0, max_value=len(animals)))]
+    x = adjectives[draw(st.integers(min_value=0, max_value=len(adjectives)-1))]
+    y = adjectives[draw(st.integers(min_value=0, max_value=len(adjectives)-1))]
+    z = animals[draw(st.integers(min_value=0, max_value=len(animals)-1))]
     assume(x != y)
     return ' '.join((x, y, z))    
     
