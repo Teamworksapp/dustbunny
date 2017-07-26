@@ -2,6 +2,7 @@ import itertools
 import copy
 from .perms import AllPerms, SomePerms
 from hypothesis import given, settings
+from io import StringIO
 
 
 class Generate(object):
@@ -20,6 +21,25 @@ class Generate(object):
         self.fixtures = {}
         self.relative_values = []
         self.extras = {}
+        self.generated_instances = []
+        
+    def get_delete_sql(self):
+        from sqlalchemy.inspection import inspect
+        pk_names = {}
+        
+        x = StringIO()
+        for instance in reversed(self.generated_instances):
+            cls = instance.__class__
+            if cls in pk_names:
+                pk_name = pk_names[cls]
+            else:
+                pk_name = inspect(cls).primary_key[0].name
+                pk_names[cls] = pk_name
+            x.write('DELETE FROM "{}" WHERE {}={}'.format(instance.__tablename__, pk_name, getattr(instance, pk_name)))
+            x.write('\n')
+        return x.getvalue()
+        
+            
         
     def with_extras(self, **kwargs):
         ret = copy.copy(self)
@@ -33,9 +53,15 @@ class Generate(object):
             
     def execute(self):
         if self.parents is None:
-            return self._do()
+            self.generated_instances.extend(self._do())
         else:
-            return list(itertools.chain(*(self._do(**p) for p in self.parents)))
+            self.generated_instances.extend(list(itertools.chain(*(self._do(**p) for p in self.parents))))
+        return self.generated_instances
+        
+    def remove(self):
+        for inst in reversed(self.generated_instances):
+            self.db.session.delete(inst)
+        self.db.session.commit()
                 
     def _do(self, **parents):
         if self.dist is not None:
