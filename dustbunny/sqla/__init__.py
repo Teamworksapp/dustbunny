@@ -1,6 +1,7 @@
 """
-SQLAlchemy
-==========
+SQLAlchemy Tools
+================
+
 """
 
 from sqlalchemy import event
@@ -8,6 +9,9 @@ from sqlalchemy.orm import mapper
 from functools import partial
 
 def import_upon_configure(Base, here):
+    """
+    Import ORM models from the given base class into the current namespace.
+    """
     def import_models_into_namespace():
         for class_ in Base._decl_class_registry.values():
             if hasattr(class_, '__tablename__'):
