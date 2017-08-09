@@ -5,13 +5,25 @@
 
 ## Introduction
 
-Dustbunny creates random records for SQL databases. It's based on [Hypothesis](http://hypothesis.works/) and uses it to 
+Dustbunny creates fuzz records for SQL databases. It's based on [Hypothesis](http://hypothesis.works/) and uses it to 
 generate random values for data columns. The difference between using Dustbunny vs. Hypothesis directly is that it's 
-easier to generate values that are relative to an already generated value, and it's easier to manage relationships 
-between tables, such as foreign key relationships. 
+easier to generate values that are relative to an already generated value, and it's easier to structure the generation 
+of relationships between tables, such as foreign keys. 
 
-Dustbunny also records the primary keys of the records it generates, so you can remove them from the database when you 
+Dustbunny also records the records it generates, so you can remove them from the database when you 
 are done with them.
+
+## Working with Dustbunny
+
+1. Create a Generate instance with the sqla session and ORM model that you want to generate.
+2. Change the creation function (will use the default model create if you don't)
+3. Set the number of records you want to generate total 
+4. Set-up parent records using `for_some` or `for all`
+4. Set fixed and random values
+5. Set relative value functions
+6. Call the `.execute()` function
+7. Commit to the database. Generally your creation function should just create, not commit, for the sake of speed.
+
 
 ## Example:
 
@@ -79,4 +91,26 @@ gen = Generate(db, Appointment)\
 worker_appointments.extend(gen.execute())  # actually create the records
 
 db.session.commit()  # we don't commit during the generation because it takes forever.
+```
+
+A second example, using `for_every` to run the generator once for every parent:
+
+```python
+db = # ... the orm instance
+Log = # ... a db model.
+use_controller = # ... a function.
+gen = Generate(db, Log)\
+    .by_method(use_controller)\
+    .num(n=1)\
+    .for_every( # for each permutation of
+        ('config', Config.query.all()),  # every TmpActivityLogConfig record that exists
+        ('log_start_date', date_range)  # for 52 weeks
+    ).with_fixed_values_for(  # set these attributes of the record to fixed values
+        log_stage_seq=0,
+        log_review_date=None
+    ).with_relative_values_for(  # set these attributes of the record to values based on everything that came before
+        log_end_date=lambda **kwargs: kwargs['log_start_date'] + timedelta(days=7)  # make the end date 1 week after the given config
+    )
+    
+logs = gen.execute()  # execute the insert
 ```
