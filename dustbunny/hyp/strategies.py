@@ -3,10 +3,15 @@ Define a bounded date strategy for Hypothesis.
 """
 
 from hypothesis.errors import InvalidArgument
-from hypothesis.searchstrategy import SearchStrategy
-from hypothesis.strategies import defines_strategy, composite
+from hypothesis.strategies import composite
+from hypothesis.strategies._internal import SearchStrategy
+from hypothesis.strategies._internal.core import base_defines_strategy
 from hypothesis import assume, strategies as st
 import hypothesis.internal.conjecture.utils as cu
+
+# cstump dev note: things get gross here
+from hypothesis.strategies._internal import SearchStrategy
+from hypothesis.strategies._internal.core import base_defines_strategy
 
 import pytz
 import datetime as dt
@@ -28,6 +33,8 @@ __all__ = (
     'alphanumeric',
     'datetimes_in_range',
 )
+
+defines_strategy = base_defines_strategy(False)
 
 words = partial(st.text, alphabet=WORDCHARS)
 alphanumeric = partial(st.text, alphabet=ALPHANUM)
