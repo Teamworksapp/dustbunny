@@ -17,7 +17,7 @@ class Generate(object):
         g.execute()
         
     """
-    def __init__(self, db, model, create_func=None):
+    def __init__(self, db, model, create_func=None, deadline=200):
         if create_func:
             self.create = create_func
         else:
@@ -33,6 +33,7 @@ class Generate(object):
         self.relative_values = []
         self.extras = {}
         self.generated_instances = []
+        self.deadline = deadline
 
     def with_extras(self, **kwargs):
         """
@@ -85,7 +86,7 @@ class Generate(object):
             
         recs = []
             
-        @settings(max_examples=k)
+        @settings(max_examples=k, deadline=self.deadline)
         def gen(**kwargs):
             rels = {}
             for rv in self.relative_values:
@@ -115,7 +116,7 @@ class Generate(object):
         ret.dist = dist
         
         return ret
-    
+
     def for_every(self, *args):
         """
         Generates child instances, one for every permutation of args.
